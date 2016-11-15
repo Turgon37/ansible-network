@@ -35,9 +35,9 @@ iface {{ item.device }} inet dhcp
 {% if item.dns is defined %}
   # DNS
   dns-nameservers{% for addr in item.dns %} {{ addr }}{% endfor %}
+
 {% endif %}
 {% if item.domain is defined %}
   # DOMAIN
-  domain {{ item.domain }}
-  search {{ item.domain }}
+  dns-search {{ item.domain }}
 {% endif %}

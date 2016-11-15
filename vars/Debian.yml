@@ -1,5 +1,5 @@
 ---
-network__service_name: network
+network__service_name: networking
 
 network__pkgs:
   - python-selinux
