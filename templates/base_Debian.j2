@@ -1,0 +1,43 @@
+#
+# {{ ansible_managed }}
+#
+{% if item.bootproto == 'static' %}
+auto {{ item.device }}
+iface {{ item.device }} inet static
+{%  if item.ipv4 is defined %}
+  # IPV4
+{%    if item.ipv4.address is defined %}
+  address {{ item.ipv4.address }}
+{%    endif %}
+{%    if item.ipv4.netmask is defined %}
+  netmask {{ item.ipv4.netmask }}
+{%    endif %}
+{%    if item.ipv4.gateway is defined %}
+  gateway {{ item.ipv4.gateway }}
+{%    endif %}
+{%  endif %}
+{% endif %}
+{% if item.bootproto == 'dhcp' %}
+auto {{ item.device }}
+iface {{ item.device }} inet dhcp
+{% endif %}
+{% block device %}
+{% endblock %}
+{% if item.ipv4 is defined and item.ipv4.route is defined %}
+  # ROUTE
+{%   for route in item.ipv4.route %}
+  post-up route add -net {{ route.network }}  netmask {{ route.netmask }} gw {{ route.gateway }} dev {{ item.device }}
+  pre-down route del -net {{ route.network }}  netmask {{ route.netmask }} gw {{ route.gateway }} dev {{ item.device }}
+#  post-up ip route add {{ route.network }} via {{ route.gateway }} dev {{ item.device }}
+#  pre-down ip route del {{ route.network }} via {{ route.gateway }} dev {{ item.device }}
+{%   endfor %}
+{% endif %}
+{% if item.dns is defined %}
+  # DNS
+  dns-nameservers{% for addr in item.dns %} {{ addr }}{% endfor %}
+{% endif %}
+{% if item.domain is defined %}
+  # DOMAIN
+  domain {{ item.domain }}
+  search {{ item.domain }}
+{% endif %}

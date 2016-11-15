@@ -1,0 +1,15 @@
+{% extends "base_RedHat.j2" %}
+{% block device %}
+TYPE=Bridge
+{% if item.bridge_stp is defined %}
+STP={{ item.bridge_stp }}
+{% else %}
+STP=no
+{% endif %}
+BRIDGING_OPTS=priority=32768
+{% if item.bridge_delay is defined %}
+DELAY={{ item.bridge_delay }}
+{% else %}
+DELAY=0
+{% endif %}
+{% endblock %}

@@ -1,0 +1,63 @@
+#
+# {{ ansible_managed }}
+#
+DEVICE={{ item.device }}
+{% if item.name is defined %}
+NAME={{ item.name }}
+{% endif %}
+{% block device %}
+{% endblock %}
+{% if item.bridge is defined %}
+BRIDGE={{ item.bridge }}
+{% elif item.bootproto == 'dhcp' or item.bootproto == 'bootp' %}
+BOOTPROTO=dhcp
+DHCP_HOSTNAME={{ network_dhcp_hostname }}
+DHCPRELEASE=1
+PERSISTENT_DHCLIENT=1
+{% elif item.bootproto == 'static' %}
+BOOTPROTO=none
+{%  if item.ipv4 is defined %}
+# IPV4
+{%    if item.ipv4.address is defined %}
+IPADDR={{ item.ipv4.address }}
+{%    endif %}
+{%    if item.ipv4.netmask is defined %}
+NETMASK={{ item.ipv4.netmask }}
+{%    endif %}
+{%    if item.ipv4.gateway is defined %}
+GATEWAY={{ item.ipv4.gateway }}
+{%    endif %}
+IPV4_FAILURE_FATAL=no
+{%  endif %}
+# IPV6
+{%  if item.ipv6 is defined %}
+IPV6INIT=yes
+{%    if item.ipv6.address is defined %}
+IPV6ADDR={{ item.ipv6.address }}
+{%    endif %}
+{%    if item.ipv6.secondaries is defined %}
+IPV6ADDR_SECONDARIES={{ item.ipv6.secondaries | join(" ") }}
+{%    endif %}
+IPV6_PRIVACY=rfc3041
+{%  else %}
+IPV6INIT=no
+{%  endif %}
+# DNS
+{%  if item.domain is defined %}
+DOMAIN={{ item.domain }}
+{%  endif %}
+{%  if item.dns is defined %}
+{%    for addr in item.dns %}
+DNS{{ loop.index }}={{ addr }}
+{%    endfor %}
+PEERDNS=yes
+{%  else %}
+PEERDNS=no
+{%  endif %}
+{% else %}
+BOOTPROTO=none
+{% endif %}
+{% if item.firewall_zone is defined %}
+ZONE={{ item.firewall_zone }}
+{% endif %}
+ONBOOT={{ item.onboot | d(False) | bool | ternary('yes', 'no') }}

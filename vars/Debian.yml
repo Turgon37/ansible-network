@@ -1,0 +1,13 @@
+---
+network__service_name: network
+
+network__pkgs:
+  - python-selinux
+  - resolvconf
+  - '{{ "bridge-utils" if (network_bridge_interfaces is defined and network_bridge_interfaces | length > 0) else "" }}'
+  - '{{ "ifenslave-2.6" if (network_bond_interfaces is defined and network_bond_interfaces | length > 0) else "" }}'
+
+net_path: "/etc/network/interfaces.d"
+
+network__conflict_pkgs:
+  - network-manager
