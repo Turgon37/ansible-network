@@ -4,7 +4,7 @@
 - name: Create the network configuration file for ethernet devices
   template:
     src: 'ethernet_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/ifcfg-{{ item.device }}'
+    dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
   with_items: '{{ network__ether_interfaces }}'
   notify: [ 'Restart Network service' ]
   tags: ['network']
