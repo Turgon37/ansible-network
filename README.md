@@ -29,6 +29,8 @@ The variables that can be passed to this role and a brief description about them
 | network__ether_interfaces          |  The list of ethernet interfaces to be added to the sytem |
 | network__bridge_interfaces         |  The list of bridge interfaces to be added to the sytem   |
 | network__vlan_interfaces           | The list of vlan interfaces to be added to the sytem      |
+| network__dhcp_hostname           | The hostname to use when the host introduce itself to the DHCP server (for distribution that allow this parameter)      |
+| network__conflict_pkgs           | The list of package(s) that conflict with this role (commonly NetworkManager)  |
 
 ### Example
 
