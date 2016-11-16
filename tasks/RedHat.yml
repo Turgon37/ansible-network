@@ -5,18 +5,18 @@
   template:
     src: 'ethernet_{{ ansible_os_family }}.j2'
     dest: '{{ net_path }}/ifcfg-{{ item.device }}'
-  with_items: '{{ network_ether_interfaces }}'
+  with_items: '{{ network__ether_interfaces }}'
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 - name: Write configuration files for IPv4 routes
   template:
     src: 'route_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/route-{{ item.device }}'
-  with_items: '{{ network_ether_interfaces }}'
+    dest: '{{ network__net_path }}/route-{{ item.device }}'
+  with_items: '{{ network__ether_interfaces }}'
   when: item.ipv4.route is defined
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 
 ### VLAN
@@ -24,19 +24,19 @@
 - name: Create the network configuration file for VLAN devices
   template:
     src: 'vlan_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/ifcfg-{{ item.device }}'
-  with_items: '{{ network_vlan_interfaces }}'
+    dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
+  with_items: '{{ network__vlan_interfaces }}'
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 - name: Write configuration files for IPv4 routes
   template:
     src: 'route_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/route-{{ item.device }}'
-  with_items: '{{ network_vlan_interfaces }}'
+    dest: '{{ network__net_path }}/route-{{ item.device }}'
+  with_items: '{{ network__vlan_interfaces }}'
   when: item.ipv4.route is defined
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 
 ### BRIDGE
@@ -44,19 +44,19 @@
 - name: Create the network configuration file for bridge devices
   template:
     src: 'bridge_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/ifcfg-{{ item.device }}'
-  with_items: '{{ network_bridge_interfaces }}'
+    dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
+  with_items: '{{ network__bridge_interfaces }}'
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 - name: Write configuration files for IPv4 routes
   template:
     src: 'route_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/route-{{ item.device }}'
-  with_items: '{{ network_bridge_interfaces }}'
+    dest: '{{ network__net_path }}/route-{{ item.device }}'
+  with_items: '{{ network__bridge_interfaces }}'
   when: item.ipv4.route is defined
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 
 #- shell: ifdown {{ item.item.device }}; ifup {{ item.item.device }}

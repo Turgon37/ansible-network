@@ -1,25 +1,24 @@
 ---
-#
 # Network role configuration
 #
 
 
 # List of ethernet interfaces
-network_ether_interfaces: []
+network__ether_interfaces: []
 
 # List of bridge interfaces
-network_bridge_interfaces: []
+network__bridge_interfaces: []
 
 # List of vlans interfaces
-network_vlan_interfaces: []
+network__vlan_interfaces: []
 
 # List of bond interfaces
-network_bond_interfaces: []
+network__bond_interfaces: []
 
 # Parameter
 
 # The name that the DHCP client will send to the DHCP server
-network_dhcp_hostname: '{{ inventory_hostname }}'
+network__dhcp_hostname: '{{ inventory_hostname }}'
 
 # The list of packages that conflict with static network configuration
 # so theses packages will be removed

@@ -3,10 +3,10 @@ network__service_name: network
 
 network__pkgs:
   - libselinux-python
-  - '{{ "bridge-utils" if (network_bridge_interfaces is defined and network_bridge_interfaces | length > 0) else "" }}'
+  - '{{ "bridge-utils" if (network__bridge_interfaces is defined and network__bridge_interfaces | length > 0) else "" }}'
   - iputils
 
-net_path: "/etc/sysconfig/network-scripts/"
+network__net_path: "/etc/sysconfig/network-scripts/"
 
 network__conflict_pkgs:
   - NetworkManager

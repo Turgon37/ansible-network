@@ -2,34 +2,34 @@
 - name: Make sure the include line is there in interfaces file
   lineinfile: >
      regexp="^source\ \/etc\/network\/interfaces.d\/\*"
-     line="source /etc/network/interfaces.d/*"
+     line="source {{ network__net_path }}/*"
      dest=/etc/network/interfaces
      state=present
      insertafter=EOF
-  tags: network
+  tags: ['network']
 
 - name: Create the directory for interface cfg files
   file: 
-    path: '{{ net_path }}'
+    path: '{{ network__net_path }}'
     state: directory
-  tags: network
+  tags: ['network']
 
 ### ETHERNET
 
 - name: Create the network configuration file for ethernet devices
   template:
     src: 'ethernet_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/ifcfg-{{ item.device }}'
-  with_items: '{{ network_ether_interfaces }}'
+    dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
+  with_items: '{{ network__ether_interfaces }}'
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
 
 ### VLAN
 
 - name: Create the network configuration file for VLAN devices
   template:
     src: 'vlan_{{ ansible_os_family }}.j2'
-    dest: '{{ net_path }}/ifcfg-{{ item.device }}'
-  with_items: '{{ network_vlan_interfaces }}'
+    dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
+  with_items: '{{ network__vlan_interfaces }}'
   notify: [ 'Restart Network service' ]
-  tags: network
+  tags: ['network']
