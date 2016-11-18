@@ -4,12 +4,16 @@
   tags: ['network']
 
 - name: Remove the conflicted packages
-  package: name={{ item }} state=absent
+  package:
+    name: '{{ item }}'
+    state: absent
   with_items: '{{ network__conflict_pkgs }}'
   tags: ['network']
 
 - name: Install the required packages
-  package: name={{ item }} state=installed
+  package:
+    name: '{{ item }}'
+    state: installed
   with_items: '{{ network__pkgs }}'
   when: item | length > 0
   tags: ['network']
