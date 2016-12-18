@@ -10,3 +10,4 @@ network__net_path: "/etc/sysconfig/network-scripts/"
 
 network__conflict_pkgs:
   - NetworkManager
+  - NetworkManager-libnm
