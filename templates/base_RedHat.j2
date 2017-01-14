@@ -61,3 +61,4 @@ BOOTPROTO=none
 ZONE={{ item.firewall_zone }}
 {% endif %}
 ONBOOT={{ item.onboot | d(False) | bool | ternary('yes', 'no') }}
+NM_CONTROLLED=no
