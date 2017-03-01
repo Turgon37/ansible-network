@@ -22,6 +22,9 @@
   include: "{{ ansible_os_family }}.yml"
   tags: ['network']
 
+- meta: flush_handlers
+  tags: ['network']
+
 ### BRIDGE
 
 #- name: Create the network configuration file for bridge devices
