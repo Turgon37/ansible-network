@@ -47,6 +47,7 @@
 ### ETHERNET
 
 - name: Create the network configuration file for ethernet devices
+  become: yes
   template:
     src: 'ethernet_{{ ansible_os_family }}.j2'
     dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
@@ -55,18 +56,19 @@
   tags: ['network']
 
 - name: Write configuration files for IPv4 routes
+  become: yes
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ network__net_path }}/route-{{ item.device }}'
   with_items: '{{ network__ether_interfaces }}'
-  when: item.ipv4.route is defined
+  when: item.ipv4 is defined and item.ipv4.route is defined
   notify: [ 'Restart Network service' ]
   tags: ['network']
-
 
 ### VLAN
 
 - name: Create the network configuration file for VLAN devices
+  become: yes
   template:
     src: 'vlan_{{ ansible_os_family }}.j2'
     dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
@@ -75,11 +77,12 @@
   tags: ['network']
 
 - name: Write configuration files for IPv4 routes
+  become: yes
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ network__net_path }}/route-{{ item.device }}'
   with_items: '{{ network__vlan_interfaces }}'
-  when: item.ipv4.route is defined
+  when: item.ipv4 is defined and item.ipv4.route is defined
   notify: [ 'Restart Network service' ]
   tags: ['network']
 
@@ -87,6 +90,7 @@
 ### BRIDGE
 
 - name: Create the network configuration file for bridge devices
+  become: yes
   template:
     src: 'bridge_{{ ansible_os_family }}.j2'
     dest: '{{ network__net_path }}/ifcfg-{{ item.device }}'
@@ -95,11 +99,12 @@
   tags: ['network']
 
 - name: Write configuration files for IPv4 routes
+  become: yes
   template:
     src: 'route_{{ ansible_os_family }}.j2'
     dest: '{{ network__net_path }}/route-{{ item.device }}'
   with_items: '{{ network__bridge_interfaces }}'
-  when: item.ipv4.route is defined
+  when: item.ipv4 is defined and item.ipv4.route is defined
   notify: [ 'Restart Network service' ]
   tags: ['network']
 
