@@ -9,9 +9,28 @@
   tags: ['network']
 
 - name: Create the directory for interface cfg files
-  file: 
+  file:
     path: '{{ network__net_path }}'
     state: directory
+  tags: ['network']
+
+## Check invalid configuration
+
+- name: List configured network interfaces
+  find:
+    paths: "{{ network__net_path }}/"
+    patterns: "ifcfg-*"
+  register: _network__interfaces
+  tags: ['network']
+
+- name: Remove all inconsistent interfaces configurations
+  become: yes
+  file:
+    state: absent
+    path: '{{ item }}'
+  with_items: "{{ _network__interfaces.files | map(attribute='path') | list }}"
+  when: item | basename | replace('ifcfg-', '') not in network__interfaces | map(attribute='device') | list
+  notify: [ 'Restart Network service' ]
   tags: ['network']
 
 ### ETHERNET

@@ -18,6 +18,22 @@
   when: item | length > 0
   tags: ['network']
 
+- name: Init a fact which contains all network configurations
+  set_fact:
+    network__interfaces: '{{ network__ether_interfaces + network__bridge_interfaces + network__vlan_interfaces + network__bond_interfaces }}'
+  tags: ['network']
+
+- name: Check unicity of interface configuration
+  fail:
+    msg: "You have at least a device name which appear multiple times in your configuration"
+  when: >
+    network__interfaces | map(attribute='device') | list | length != (
+    network__ether_interfaces | map(attribute='device') | list | length +
+    network__bridge_interfaces | map(attribute='device') | list | length +
+    network__vlan_interfaces | map(attribute='device') | list | length +
+    network__bond_interfaces | map(attribute='device') | list | length )
+  tags: ['network']
+
 - name: Run the OS specific tasks
   include: "{{ ansible_os_family }}.yml"
   tags: ['network']

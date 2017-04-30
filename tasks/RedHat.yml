@@ -1,4 +1,49 @@
 ---
+## Check invalid configuration
+- name: List configured network interfaces
+  find:
+    paths: "{{ network__net_path }}/"
+    patterns: "ifcfg-*"
+  register: _network__interfaces
+  tags: ['network']
+
+- name: List configured network routes
+  find:
+    paths: "{{ network__net_path }}/"
+    patterns: "route-*"
+  register: _network__routes
+  tags: ['network']
+
+- name: Remove all inconsistent interfaces configurations
+  become: yes
+  file:
+    state: absent
+    path: '{{ item }}'
+  with_items: "{{ _network__interfaces.files | map(attribute='path') | list }}"
+  when: item | basename | replace('ifcfg-', '') not in network__interfaces | map(attribute='device') | list
+  notify: [ 'Restart Network service' ]
+  tags: ['network']
+
+- name: Remove all inconsistent routes configurations
+  become: yes
+  file:
+    state: absent
+    path: '{{ item }}'
+  with_items: "{{ _network__routes.files | map(attribute='path') | list }}"
+  when: item | basename | replace('route-', '') not in network__interfaces | map(attribute='device') | list
+  notify: [ 'Restart Network service' ]
+  tags: ['network']
+
+- name: Remove routes configuration that must be empty
+  become: yes
+  file:
+    state: absent
+    path: '{{ network__net_path }}/route-{{ item.device }}'
+  with_items: '{{ network__interfaces }}'
+  when: item.ipv4 is not defined or (item.ipv4 is defined and item.ipv4.route is not defined)
+  notify: [ 'Restart Network service' ]
+  tags: ['network']
+
 ### ETHERNET
 
 - name: Create the network configuration file for ethernet devices
