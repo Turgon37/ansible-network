@@ -1,0 +1,33 @@
+---
+- name: Load default interfaces into ether interfaces
+  set_fact:
+    network__ethernet_interfaces: '{{ network__default_interfaces|union(network__ethernet_interfaces) }}'
+
+- name: Init a fact which contains all network configurations
+  set_fact:
+    _network__interfaces: '{{ network__ethernet_interfaces|
+                            union(network__bridge_interfaces)|
+                            union(network__vlan_interfaces)|
+                            union(network__bond_interfaces) }}'
+
+- name: Assert all interface declaration have a 'device' item
+  assert:
+    that:
+      - item.device is defined and item.device is string
+  with_items: '{{ _network__interfaces }}'
+
+- name: Check unicity of interface configuration
+  fail:
+    msg: "You have at least a device name which appear multiple times in your configuration"
+  when: >
+    _network__interfaces|map(attribute='device')|list|length != (
+      network__ethernet_interfaces|map(attribute='device')|list|length +
+      network__bridge_interfaces|map(attribute='device')|list|length +
+      network__vlan_interfaces|map(attribute='device')|list|length +
+      network__bond_interfaces|map(attribute='device')|list|length )
+
+- name: Assert dns configuration per interface
+  assert:
+    that:
+      - item.dns is not defined or item.dns is defined and item.dns is iterable and item.dns is not string
+  with_items: '{{ _network__interfaces }}'

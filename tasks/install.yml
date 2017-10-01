@@ -1,0 +1,26 @@
+---
+- name: Remove the conflicted packages
+  package:
+    name: '{{ item }}'
+    state: absent
+  with_items: '{{ network__conflict_packages_names }}'
+
+- name: Install the DHCP client packages if needed
+  package:
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ network__dhcp_client_packages_names }}'
+  when: network__dhcp_enable
+
+- name: Remove the DHCP client packages if unneeded
+  package:
+    name: '{{ item }}'
+    state: absent
+  with_items: '{{ network__dhcp_client_packages_names }}'
+  when: not network__dhcp_enable
+
+- name: Install the required packages
+  package:
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ network__packages_names }}'

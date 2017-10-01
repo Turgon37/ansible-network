@@ -1,0 +1,24 @@
+#
+# {{ ansible_managed }}
+#
+{% for route in item.ipv4.routes %}
+{#
+    NEW IP COMMAND FORMAT
+                          #}
+{%   if network__route_format == 'ipcommand' %}
+{{ route.network ~ '/' ~ (   (route.network~'/'~route.netmask)|ipaddr('prefix')   ) }} {% if route.gateway is defined %} via {{ route.gateway }} {% endif %} dev {{ item.device }}
+{# auto compute the default gateway #}
+{%     if item.ipv4.gateway is defined and route.network == item.ipv4.gateway and route.netmask|ipaddr('prefix') == 32 %}
+default via {{ route.network }}
+{%     endif %}
+{%   else %}
+{#
+    OLD SYSCONFIG FORMAT
+                          #}
+ADDRESS{{ loop.index0 }}={{ route.network }}
+NETMASK{{ loop.index0 }}={{ route.netmask }}
+{%     if route.gateway is defined %}
+GATEWAY{{ loop.index0 }}={{ route.gateway }}
+{%     endif %}
+{%   endif %}
+{% endfor %}

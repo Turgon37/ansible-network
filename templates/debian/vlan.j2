@@ -1,4 +1,4 @@
-{% extends "base_Debian.j2" %}
-{% block device %}
+{% extends "base.j2" %}
+{% block interface %}
   vlan-raw-device {{ item.physical_device }}
 {% endblock %}

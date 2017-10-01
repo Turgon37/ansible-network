@@ -1,0 +1,57 @@
+---
+- name: Create interfaces file
+  template:
+    src: '{{ ansible_os_family|lower }}/interfaces.j2'
+    dest: '/etc/network/interfaces'
+    owner: root
+    group: root
+    mode: 0644
+  notify: [ 'restart-network-service' ]
+
+- name: Create the directory for interfaces files
+  file:
+    path: '{{ network__interfaces_include_dir }}'
+    state: directory
+    owner: root
+    group: root
+
+## Check invalid configuration
+
+- name: List configured network interfaces
+  find:
+    paths: "{{ network__interfaces_include_dir }}"
+    patterns: "ifcfg-*"
+  register: _network__installed_interfaces
+
+- name: Remove all inconsistent interfaces configurations
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items: "{{ _network__installed_interfaces.files|map(attribute='path')|list }}"
+  when: item|basename|replace('ifcfg-', '') not in _network__interfaces|map(attribute='device')|list
+  notify: [ 'restart-network-service' ]
+
+### ETHERNET
+
+- name: Create the network configuration file for ethernet devices (except 'lo')
+  template:
+    src: '{{ ansible_os_family|lower }}/ethernet.j2'
+    dest: '{{ network__interfaces_include_dir }}/ifcfg-{{ item.device }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ network__ethernet_interfaces }}'
+  when: item.device != 'lo'
+  notify: [ 'restart-network-service' ]
+
+### VLAN
+
+- name: Create the network configuration file for VLAN interfaces
+  template:
+    src: '{{ ansible_os_family|lower }}/vlan.j2'
+    dest: '{{ network__interfaces_include_dir }}/ifcfg-{{ item.device }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ network__vlan_interfaces }}'
+  notify: [ 'restart-network-service' ]

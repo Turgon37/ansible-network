@@ -1,8 +1,0 @@
-{% extends "base_RedHat.j2" %}
-{% block device %}
-TYPE=Vlan
-VLAN=yes
-REORDER_HDR={{ item.reorder_header | d(True) | bool | ternary('yes', 'no') }}
-PHYSDEV={{ item.physical_device }}
-VLAN_ID={{ item.vlan_id }}
-{% endblock %}

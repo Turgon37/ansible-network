@@ -1,5 +1,5 @@
-{% extends "base_RedHat.j2" %}
-{% block device %}
+{% extends "base.j2" %}
+{% block interface %}
 TYPE=Bridge
 {% if item.bridge_stp is defined %}
 STP={{ item.bridge_stp }}

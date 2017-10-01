@@ -1,13 +1,19 @@
 ---
 network__service_name: network
 
-network__pkgs:
+network__packages_names_base:
   - libselinux-python
-  - '{{ "bridge-utils" if (network__bridge_interfaces is defined and network__bridge_interfaces | length > 0) else "" }}'
   - iputils
 
-network__net_path: "/etc/sysconfig/network-scripts/"
+network__packages_names: '{{
+    network__packages_names_base|
+    union(  ["bridge-utils"] if (network__bridge_interfaces is defined and network__bridge_interfaces|length > 0) else []  )
+  }}'
 
-network__conflict_pkgs:
+network__interfaces_include_dir: "/etc/sysconfig/network-scripts"
+
+network__conflict_packages_names:
   - NetworkManager
   - NetworkManager-libnm
+
+network__route_format: ipcommand

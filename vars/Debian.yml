@@ -1,13 +1,20 @@
 ---
 network__service_name: networking
 
-network__pkgs:
+network__packages_names_base:
   - python-selinux
   - resolvconf
-  - '{{ "bridge-utils" if (network__bridge_interfaces is defined and network__bridge_interfaces | length > 0) else "" }}'
-  - '{{ "ifenslave-2.6" if (network__bond_interfaces is defined and network__bond_interfaces | length > 0) else "" }}'
 
-network__net_path: "/etc/network/interfaces.d"
+network__packages_names: '{{
+    network__packages_names_base|
+    union( ["bridge-utils"] if (network__bridge_interfaces is defined and network__bridge_interfaces|length > 0) else [] )|
+    union( ["ifenslave-2.6"] if (network__bond_interfaces is defined and network__bond_interfaces|length > 0) else [] )
+  }}'
 
-network__conflict_pkgs:
+network__interfaces_include_dir: "/etc/network/interfaces.d"
+
+network__conflict_packages_names:
   - network-manager
+
+network__dhcp_client_packages_names:
+  - isc-dhcp-client

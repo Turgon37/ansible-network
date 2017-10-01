@@ -1,6 +1,10 @@
 #
 # {{ ansible_managed }}
 #
+
+{#           #}
+{#  STATIC   #}
+{#           #}
 {% if item.bootproto == 'static' %}
 auto {{ item.device }}
 iface {{ item.device }} inet static
@@ -12,31 +16,45 @@ iface {{ item.device }} inet static
 {%    if item.ipv4.netmask is defined %}
   netmask {{ item.ipv4.netmask }}
 {%    endif %}
+{%    if item.ipv4.broadcast is defined %}
+  broadcast {{ item.ipv4.broadcast }}
+{%    endif %}
 {%    if item.ipv4.gateway is defined %}
   gateway {{ item.ipv4.gateway }}
 {%    endif %}
 {%  endif %}
-{% endif %}
-{% if item.bootproto == 'dhcp' %}
+{#           #}
+{#   DHCP    #}
+{#           #}
+{% elif item.bootproto == 'dhcp' %}
 auto {{ item.device }}
 iface {{ item.device }} inet dhcp
 {% endif %}
-{% block device %}
+{% block interface %}
 {% endblock %}
-{% if item.ipv4 is defined and item.ipv4.route is defined %}
-  # ROUTE
-{%   for route in item.ipv4.route %}
+{% if item.ipv4 is defined and item.ipv4.routes is defined %}
+  # ROUTES
+{%   for route in item.ipv4.routes %}
+{%     if network__route_format == 'ipcommand' %}
+{#
+    NEW IP COMMAND FORMAT
+                          #}
+  post-up ip route add {{ route.network ~ '/' ~ (   (route.network~'/'~route.netmask)|ipaddr('prefix')   ) }} {% if route.gateway is defined %} via {{ route.gateway }} {% endif %} dev {{ item.device }}
+  pre-down ip route del {{ route.network ~ '/' ~ (   (route.network~'/'~route.netmask)|ipaddr('prefix')   ) }} {% if route.gateway is defined %} via {{ route.gateway }} {% endif %} dev {{ item.device }}
+{%     else %}
+{#
+    OLD SYSCONFIG FORMAT
+                          #}
   post-up route add -net {{ route.network }}  netmask {{ route.netmask }} gw {{ route.gateway }} dev {{ item.device }}
   pre-down route del -net {{ route.network }}  netmask {{ route.netmask }} gw {{ route.gateway }} dev {{ item.device }}
-#  post-up ip route add {{ route.network }} via {{ route.gateway }} dev {{ item.device }}
-#  pre-down ip route del {{ route.network }} via {{ route.gateway }} dev {{ item.device }}
+{%     endif %}
 {%   endfor %}
 {% endif %}
 {% if item.dns is defined %}
   # DNS
   dns-nameservers{% for addr in item.dns %} {{ addr }}{% endfor %}
-
 {% endif %}
+
 {% if item.domain is defined %}
   # DOMAIN
   dns-search {{ item.domain }}

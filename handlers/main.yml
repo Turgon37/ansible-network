@@ -1,9 +1,13 @@
 ---
-- name: Restart Network service
+# handlers file for network
+
+- name: restart-network-service
   service:
     name: "{{ network__service_name }}"
     state: restarted
+  notify: ['re-gather-facts']
 
-- name: Restart Network interface
+- name: restart-network-interface
   shell: ifdown {{ item.item.device }}; ifup {{ item.item.device }}
   with_items: '{{ ether_result.results }}'
+  notify: ['re-gather-facts']

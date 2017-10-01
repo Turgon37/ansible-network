@@ -1,10 +1,37 @@
 ---
-# Network role configuration
-#
+# defaults file for network
 
+# Simple placeholder to allow other roles to detect this role
+network__role: True
+
+# The list of packages that conflict with static network configuration
+# so theses packages will be removed
+network__conflict_packages_names: []
+
+# DHCP Client parameters
+# If set to False, DHCP client capabilities will be removed
+network__dhcp_enable: True
+
+network__dhcp_client_packages_names:
+  - isc-dhcp-client
+
+# The name that the DHCP client will send to the DHCP server
+network__dhcp_hostname: '{{ inventory_hostname }}'
+
+# Default network configuration for all devices
+network__default_interfaces:
+  - device: lo
+    name: loopback
+    onboot: True
+    bootproto: static
+    ipv4:
+      address: 127.0.0.1
+      netmask: 255.0.0.0
+      network: 127.0.0.0
+      broadcast: 127.255.255.255
 
 # List of ethernet interfaces
-network__ether_interfaces: []
+network__ethernet_interfaces: []
 
 # List of bridge interfaces
 network__bridge_interfaces: []
@@ -15,11 +42,14 @@ network__vlan_interfaces: []
 # List of bond interfaces
 network__bond_interfaces: []
 
-# Parameter
+# Route configuration format
+# values:
+#     normal (the default one)
+#     ipcommand : use the ip route command syntax
+network__route_format: normal
 
-# The name that the DHCP client will send to the DHCP server
-network__dhcp_hostname: '{{ inventory_hostname }}'
+# Path to the resolv.conf file
+network__resolv_conf_file: /etc/resolv.conf
 
-# The list of packages that conflict with static network configuration
-# so theses packages will be removed
-network__conflict_pkgs: []
+# Option to set in the resolv.conf file
+network__resolv_conf_options: []

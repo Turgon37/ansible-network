@@ -1,0 +1,125 @@
+---
+## Check invalid configuration
+- name: List configured network interfaces
+  find:
+    paths: "{{ network__interfaces_include_dir }}/"
+    patterns: "ifcfg-*"
+  register: _network__installed_interfaces
+
+- name: List configured network routes
+  find:
+    paths: "{{ network__interfaces_include_dir }}/"
+    patterns: "route-*"
+  register: _network__routes
+
+- name: Remove all inconsistent interfaces configurations
+  file:
+    state: absent
+    path: '{{ item }}'
+  with_items: "{{ _network__installed_interfaces.files|map(attribute='path')|list }}"
+  when: item|basename|replace('ifcfg-', '') not in _network__interfaces|map(attribute='device')|list
+  notify: [ 'restart-network-service' ]
+
+- name: Remove all inconsistent routes configurations
+  file:
+    state: absent
+    path: '{{ item }}'
+  with_items: "{{ _network__routes.files|map(attribute='path') | list }}"
+  when: item|basename|replace('route-', '') not in _network__interfaces|map(attribute='device')|list
+  notify: [ 'restart-network-service' ]
+
+- name: Remove routes configuration that must be empty
+  file:
+    state: absent
+    path: '{{ network__interfaces_include_dir }}/route-{{ item.device }}'
+  with_items: '{{ _network__interfaces }}'
+  when: item.ipv4 is not defined or (item.ipv4 is defined and item.ipv4.routes is not defined)
+  notify: [ 'restart-network-service' ]
+
+
+### ETHERNET
+
+- name: Create the network configuration file for ethernet interfaces
+  template:
+    src: '{{ ansible_os_family|lower }}/ethernet.j2'
+    dest: '{{ network__interfaces_include_dir }}/ifcfg-{{ item.device }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ network__ethernet_interfaces }}'
+  notify: [ 'restart-network-service' ]
+
+
+- name: Write configuration files for IPv4 routes
+  template:
+    src: '{{ ansible_os_family|lower }}/route.j2'
+    dest: '{{ network__interfaces_include_dir }}/route-{{ item.device }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ network__ethernet_interfaces }}'
+  when: item.ipv4 is defined and item.ipv4.routes is defined
+  notify: [ 'restart-network-service' ]
+
+
+### VLAN
+
+- name: Create the network configuration file for VLAN interfaces
+  template:
+    src: '{{ ansible_os_family|lower }}/vlan.j2'
+    dest: '{{ network__interfaces_include_dir }}/ifcfg-{{ item.device }}'
+  with_items: '{{ network__vlan_interfaces }}'
+  notify: [ 'restart-network-service' ]
+
+
+- name: Write configuration files for IPv4 routes of VLAN interfaces
+  template:
+    src: '{{ ansible_os_family|lower }}/route.j2'
+    dest: '{{ network__interfaces_include_dir }}/route-{{ item.device }}'
+  with_items: '{{ network__vlan_interfaces }}'
+  when: item.ipv4 is defined and item.ipv4.routes is defined
+  notify: [ 'restart-network-service' ]
+
+
+
+### BRIDGE
+
+- name: Create the network configuration file of bridge interfaces
+  template:
+    src: '{{ ansible_os_family|lower }}/bridge.j2'
+    dest: '{{ network__interfaces_include_dir }}/ifcfg-{{ item.device }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ network__bridge_interfaces }}'
+  notify: [ 'restart-network-service' ]
+
+
+- name: Write configuration files for IPv4 routes of bridge interfaces
+  template:
+    src: '{{ ansible_os_family|lower }}/route.j2'
+    dest: '{{ network__interfaces_include_dir }}/route-{{ item.device }}'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: '{{ network__bridge_interfaces }}'
+  when: item.ipv4 is defined and item.ipv4.routes is defined
+  notify: [ 'restart-network-service' ]
+
+
+
+#- shell: ifdown {{ item.item.device }}; ifup {{ item.item.device }}
+  #with_items: '{{ bridge_result.results }}'
+  #when: bridge_result is defined and item.changed
+
+#- name: Create the network configuration file for port on the bridge interfaces
+  #template: src=bridge_port_{{ ansible_os_family }}.j2 dest={{ net_path }}/ifcfg-{{ item.1 }}
+  #with_subelements:
+   #- '{{ network_bridge_interfaces }}'
+   #- '{{ ports if ports is defined }}'
+  #when: network_bridge_interfaces is defined
+  #register: bridge_port_result
+
+#- shell: ifdown {{ item.item.1 }}; ifup {{ item.item.1 }}
+  #with_items: '{{ bridge_port_result.results }}'
+  #when: bridge_port_result is defined and item.changed

@@ -5,7 +5,7 @@ DEVICE={{ item.device }}
 {% if item.name is defined %}
 NAME={{ item.name }}
 {% endif %}
-{% block device %}
+{% block interface %}
 {% endblock %}
 {% if item.bridge is defined %}
 BRIDGE={{ item.bridge }}
@@ -24,6 +24,12 @@ IPADDR={{ item.ipv4.address }}
 {%    if item.ipv4.netmask is defined %}
 NETMASK={{ item.ipv4.netmask }}
 {%    endif %}
+{%    if item.ipv4.network is defined %}
+NETWORK={{ item.ipv4.network }}
+{%    endif %}
+{%    if item.ipv4.broadcast is defined %}
+BROADCAST={{ item.ipv4.broadcast }}
+{%    endif %}
 {%    if item.ipv4.gateway is defined %}
 GATEWAY={{ item.ipv4.gateway }}
 {%    endif %}
@@ -36,7 +42,7 @@ IPV6INIT=yes
 IPV6ADDR={{ item.ipv6.address }}
 {%    endif %}
 {%    if item.ipv6.secondaries is defined %}
-IPV6ADDR_SECONDARIES={{ item.ipv6.secondaries | join(" ") }}
+IPV6ADDR_SECONDARIES={{ item.ipv6.secondaries|join(" ") }}
 {%    endif %}
 IPV6_PRIVACY=rfc3041
 {%  else %}
@@ -50,7 +56,7 @@ DOMAIN={{ item.domain }}
 {%    for addr in item.dns %}
 DNS{{ loop.index }}={{ addr }}
 {%    endfor %}
-PEERDNS=yes
+PEERDNS={{ 'yes' if network__resolv_conf_options|length == 0 else 'no' }}
 {%  else %}
 PEERDNS=no
 {%  endif %}
@@ -60,5 +66,5 @@ BOOTPROTO=none
 {% if item.firewall_zone is defined %}
 ZONE={{ item.firewall_zone }}
 {% endif %}
-ONBOOT={{ item.onboot | d(False) | bool | ternary('yes', 'no') }}
+ONBOOT={{ item.onboot|d(False)|bool|ternary('yes', 'no') }}
 NM_CONTROLLED=no
