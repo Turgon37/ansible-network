@@ -1,0 +1,7 @@
+---
+
+- name: Insert custom fact file
+  copy:
+    src:  files/network.py
+    dest: "{{ facts__dir|d('/etc/ansible/facts.d') }}/network.fact"
+    mode: 0755

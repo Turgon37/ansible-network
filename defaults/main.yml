@@ -4,6 +4,9 @@
 # Simple placeholder to allow other roles to detect this role
 network__role: True
 
+# Enable facts deploiement
+network__facts: True
+
 # The list of packages that conflict with static network configuration
 # so theses packages will be removed
 network__conflict_packages_names: []

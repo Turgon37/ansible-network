@@ -20,3 +20,6 @@
 
 - import_tasks: configure.yml
   tags: ['network', 'network-configure']
+
+- include_tasks: facts.yml
+  when: network__facts
