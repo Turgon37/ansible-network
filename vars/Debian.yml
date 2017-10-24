@@ -15,6 +15,7 @@ network__interfaces_include_dir: "/etc/network/interfaces.d"
 
 network__conflict_packages_names:
   - network-manager
+  - dhcpcd5
 
 network__dhcp_client_packages_names:
   - isc-dhcp-client
