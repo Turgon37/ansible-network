@@ -7,6 +7,9 @@ network__role: True
 # Enable facts deploiement
 network__facts: True
 
+# Enable or not handlers
+network__handlers_enabled: True
+
 # The list of packages that conflict with static network configuration
 # so theses packages will be removed
 network__conflict_packages_names: []
