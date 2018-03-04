@@ -36,15 +36,15 @@ iface {{ item.device }} inet dhcp
   # ROUTES
 {%   for route in item.ipv4.routes %}
 {%     if network__route_format == 'ipcommand' %}
-{#
-    NEW IP COMMAND FORMAT
-                          #}
+{#                         #
+ #   NEW IP COMMAND FORMAT #
+ #                         #}
   post-up ip route add {{ route.network ~ '/' ~ (   (route.network~'/'~route.netmask)|ipaddr('prefix')   ) }} {% if route.gateway is defined %} via {{ route.gateway }} {% endif %} dev {{ item.device }}
   pre-down ip route del {{ route.network ~ '/' ~ (   (route.network~'/'~route.netmask)|ipaddr('prefix')   ) }} {% if route.gateway is defined %} via {{ route.gateway }} {% endif %} dev {{ item.device }}
 {%     else %}
-{#
-    OLD SYSCONFIG FORMAT
-                          #}
+{#                         #
+ #   OLD SYSCONFIG FORMAT  #
+ #                         #}
   post-up route add -net {{ route.network }}  netmask {{ route.netmask }} gw {{ route.gateway }} dev {{ item.device }}
   pre-down route del -net {{ route.network }}  netmask {{ route.netmask }} gw {{ route.gateway }} dev {{ item.device }}
 {%     endif %}

@@ -11,7 +11,9 @@ network__packages_names: '{{
     union( ["ifenslave-2.6"] if (network__bond_interfaces is defined and network__bond_interfaces|length > 0) else [] )
   }}'
 
-network__interfaces_include_dir: "/etc/network/interfaces.d"
+network__interfaces_include_dir: /etc/network/interfaces.d
+
+network__route_format: "{{ 'ipcommand' if ansible_distribution_version|version_compare('9', '>=') else 'normal' }}"
 
 network__conflict_packages_names:
   - network-manager
