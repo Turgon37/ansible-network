@@ -13,7 +13,7 @@ network__packages_names: '{{
 
 network__interfaces_include_dir: /etc/network/interfaces.d
 
-network__route_format: "{{ 'ipcommand' if ansible_distribution_version|version_compare('9', '>=') else 'normal' }}"
+network__route_format: "{{ 'ipcommand' if ansible_distribution_version is version_compare('9', '>=') else 'normal' }}"
 
 network__conflict_packages_names:
   - network-manager
