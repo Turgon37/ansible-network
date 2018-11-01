@@ -1,6 +1,5 @@
 {%- import '_macros.j2' as macros with context -%}
 {{ ansible_managed|comment(decoration='# ') }}
-
 DEVICE={{ item.device }}
 {% if item.name is defined %}
 NAME={{ item.name }}
