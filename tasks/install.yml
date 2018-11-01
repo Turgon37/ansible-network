@@ -13,4 +13,4 @@
 - name: Ensure state of DHCP client packages
   package:
     name: '{{ network__dhcp_client_packages_names|list }}'
-    state: "network__dhcp_enable|ternary('present', 'absent') }}"
+    state: "{{ network__dhcp_enable|ternary('present', 'absent') }}"
