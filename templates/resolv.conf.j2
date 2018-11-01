@@ -1,35 +1,32 @@
 {{ ansible_managed|comment(decoration='# ') }}
-
-{% set servers = [] %}
-{% set domains = [] %}
+{% set _servers = [] %}
+{% set _domains = [] %}
 {% for dns_definition in _network__interfaces|map(attribute='dns')|reject('undefined')|flatten|list %}
 {%   if dns_definition is string %}
-{%     set _ = servers.append(dns_definition) %}
+{%     set _ = _servers.append(dns_definition) %}
 {%   else %}
 {%     for addr in dns_definition %}
-{%       set _ = servers.append(addr) %}
+{%       set _ = _servers.append(addr) %}
 {%     endfor %}
 {%   endif %}
 {% endfor %}
-{% for domain_definition in _network__interfaces|map(attribute='domain')|reject('undefined')|list %}
-{%   if domain_definition  is string %}
-{%     set _ = domains.append(domain_definition ) %}
+{% for domain_definition in _network__interfaces|map(attribute='domain')|reject('undefined')|flatten|list %}
+{%   if domain_definition is string %}
+{%     set _ = _domains.append(domain_definition ) %}
 {%   else %}
 {%     for addr in domain_definition  %}
-{%       set _ = domains.append(addr) %}
+{%       set _ = _domains.append(addr) %}
 {%     endfor %}
 {%   endif %}
 {% endfor %}
-
-{% for dns in servers %}
+{% for dns in _servers %}
 nameserver {{ dns }}
 {% endfor %}
-{% for domain in domains %}
+{% for domain in _domains %}
 {%   if loop.first %}
 domain {{ domain }}
 {%   endif %}
 {% endfor %}
-
 {% if network__resolv_conf_options|length > 0 %}
 options {% for option in network__resolv_conf_options %}{{ option }} {% endfor %}
 {% endif %}
