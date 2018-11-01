@@ -1,6 +1,6 @@
-#
-# {{ ansible_managed }}
-#
+{%- import '_macros.j2' as macros with context -%}
+{{ ansible_managed|comment(decoration='# ') }}
+
 DEVICE={{ item.device }}
 {% if item.name is defined %}
 NAME={{ item.name }}
@@ -33,11 +33,11 @@ BROADCAST={{ item.ipv4.broadcast }}
 {%    if item.ipv4.gateway is defined %}
 GATEWAY={{ item.ipv4.gateway }}
 {%    endif %}
-IPV4_FAILURE_FATAL=no
+IPV4_FAILURE_FATAL={{ macros.bool(false) }}
 {%  endif %}
 # IPV6
 {%  if item.ipv6 is defined %}
-IPV6INIT=yes
+IPV6INIT={{ macros.bool(true) }}
 {%    if item.ipv6.address is defined %}
 IPV6ADDR={{ item.ipv6.address }}
 {%    endif %}
@@ -46,19 +46,19 @@ IPV6ADDR_SECONDARIES={{ item.ipv6.secondaries|join(" ") }}
 {%    endif %}
 IPV6_PRIVACY=rfc3041
 {%  else %}
-IPV6INIT=no
+IPV6INIT={{ macros.bool(false) }}
 {%  endif %}
 # DNS
 {%  if item.domain is defined %}
 DOMAIN={{ item.domain }}
 {%  endif %}
 {%  if item.dns is defined %}
-{%    for addr in item.dns %}
+{%    for addr in item.dns|flatten|list %}
 DNS{{ loop.index }}={{ addr }}
 {%    endfor %}
-PEERDNS={{ 'yes' if network__resolv_conf_options|length == 0 else 'no' }}
+PEERDNS={{ macros.bool(network__resolv_conf_options|length == 0) }}
 {%  else %}
-PEERDNS=no
+PEERDNS={{ macros.bool(false) }}
 {%  endif %}
 {% else %}
 BOOTPROTO=none
@@ -66,5 +66,6 @@ BOOTPROTO=none
 {% if item.firewall_zone is defined %}
 ZONE={{ item.firewall_zone }}
 {% endif %}
-ONBOOT={{ item.onboot|d(False)|bool|ternary('yes', 'no') }}
-NM_CONTROLLED=no
+ONBOOT={{ macros.bool(item.onboot|d(false)) }}
+NM_CONTROLLED={{ macros.bool(false) }}
+RESOLV_MODS={{ macros.bool(false) }}

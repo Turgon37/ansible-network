@@ -1,9 +1,8 @@
-#
-# {{ ansible_managed }}
-#
+{{ ansible_managed|comment(decoration='# ') }}
+
 {% set servers = [] %}
 {% set domains = [] %}
-{% for dns_definition in _network__interfaces|map(attribute='dns')|reject('undefined')|list %}
+{% for dns_definition in _network__interfaces|map(attribute='dns')|reject('undefined')|flatten|list %}
 {%   if dns_definition is string %}
 {%     set _ = servers.append(dns_definition) %}
 {%   else %}

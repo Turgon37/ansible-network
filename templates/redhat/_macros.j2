@@ -1,0 +1,9 @@
+{#
+ # Produce a boolean value in redhat format
+ #
+ # @param value : the value of the boolean
+ # @return string
+ #}
+{%- macro bool(value) -%}
+{{ value|bool|ternary('yes', 'no') }}
+{%- endmacro -%}

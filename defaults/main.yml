@@ -1,34 +1,39 @@
 ---
 # defaults file for network
 
-# Simple placeholder to allow other roles to detect this role
-network__role: True
-
 # Enable facts deploiement
-network__facts: True
+network__facts: true
 
 # Enable or not handlers
-network__handlers_enabled: True
+network__handlers_enabled: true
 
+
+### INSTALL CONFIGURATION
+# ---------------------------------------
 # The list of packages that conflict with static network configuration
 # so theses packages will be removed
 network__conflict_packages_names: []
 
-# DHCP Client parameters
-# If set to False, DHCP client capabilities will be removed
-network__dhcp_enable: True
-
+# Package required for dhcp feature
 network__dhcp_client_packages_names:
   - isc-dhcp-client
 
+
+### NETWORK CONFIGURATION
+# ---------------------------------------
+
+# DHCP Client parameters
+# If set to False, DHCP client capabilities will be removed
+network__dhcp_enable: true
+
 # The name that the DHCP client will send to the DHCP server
-network__dhcp_hostname: '{{ inventory_hostname }}'
+network__dhcp_hostname: '{{ ansible_fqdn }}'
 
 # Default network configuration for all devices
 network__default_interfaces:
   - device: lo
     name: loopback
-    onboot: True
+    onboot: true
     bootproto: static
     ipv4:
       address: 127.0.0.1

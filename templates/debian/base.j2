@@ -1,6 +1,4 @@
-#
-# {{ ansible_managed }}
-#
+{{ ansible_managed|comment(decoration='# ') }}
 
 {#           #}
 {#  STATIC   #}
@@ -52,7 +50,7 @@ iface {{ item.device }} inet dhcp
 {% endif %}
 {% if item.dns is defined %}
   # DNS
-  dns-nameservers{% for addr in item.dns %} {{ addr }}{% endfor %}
+  dns-nameservers{% for addr in item.dns|flatten|list %} {{ addr }}{% endfor %}
 {% endif %}
 
 {% if item.domain is defined %}
