@@ -1,15 +1,17 @@
 ---
+
 - name: Run the OS specific tasks
-  include_tasks: "configure-{{ ansible_os_family | lower }}.yml"
+  include_tasks: 'configure-{{ ansible_os_family | lower }}.yml'
+  tags: ['network', 'network-configure']
 
 - meta: flush_handlers
 
 - name: Test if resolvconf is enabled
   command: resolvconf --updates-are-enabled
   register: _network__resolvconf_enabled
-  check_mode: no
+  check_mode: false
   changed_when: false
-  failed_when: False
+  failed_when: false
   when: ansible_os_family == 'Debian'
 
 - name: Disable resolvconf to prevent resolv.conf to be updated

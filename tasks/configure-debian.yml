@@ -29,7 +29,7 @@
     state: absent
   with_items: "{{ _network__installed_interfaces.files|map(attribute='path')|list }}"
   when: item|basename|replace('ifcfg-', '') not in _network__interfaces|map(attribute='device')|list
-  notify: [ 'restart-network-service' ]
+  notify: ['restart-network-service']
 
 ### ETHERNET
 

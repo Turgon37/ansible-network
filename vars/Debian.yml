@@ -6,9 +6,10 @@ network__packages_names_base:
   - resolvconf
 
 network__packages_names: '{{
-    network__packages_names_base|
-    union( ["bridge-utils"] if (network__bridge_interfaces is defined and network__bridge_interfaces|length > 0) else [] )|
-    union( ["ifenslave-2.6"] if (network__bond_interfaces is defined and network__bond_interfaces|length > 0) else [] )
+    network__packages_names_base
+    |union( ["bridge-utils"] if (network__bridge_interfaces is defined and network__bridge_interfaces|length > 0) else [] )
+    |union( ["ifenslave-2.6"] if (network__bond_interfaces is defined and network__bond_interfaces|length > 0) else [] )
+    |union( ["vlan"] if (network__vlan_interfaces is defined and network__vlan_interfaces|length > 0) else [] )
   }}'
 
 network__interfaces_include_dir: /etc/network/interfaces.d

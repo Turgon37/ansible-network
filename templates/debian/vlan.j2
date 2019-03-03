@@ -1,3 +1,4 @@
+{% set item = item|combine({'device': item.device~'.'~item.vlan_id}) %}
 {% extends "base.j2" %}
 {% block interface %}
   vlan-raw-device {{ item.physical_device }}
